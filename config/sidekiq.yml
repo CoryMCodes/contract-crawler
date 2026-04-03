@@ -1,0 +1,5 @@
+:concurrency: <%= Integer(ENV.fetch("SIDEKIQ_CONCURRENCY", 5)) %>
+:queues:
+  - default
+  - crawlers
+  - enrichment

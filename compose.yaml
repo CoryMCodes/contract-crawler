@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: contract_crawler_development
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/dev.Dockerfile
+    command: bash -lc "bundle install && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/contract_crawler_development
+      DATABASE_URL_TEST: postgres://postgres:postgres@db:5432/contract_crawler_test
+      FRONTEND_ORIGIN: http://localhost:5173
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/rails
+      - bundle-data:/bundle
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/dev.Dockerfile
+    command: bash -lc "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/contract_crawler_development
+      DATABASE_URL_TEST: postgres://postgres:postgres@db:5432/contract_crawler_test
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+    volumes:
+      - .:/rails
+      - bundle-data:/bundle
+
+  frontend:
+    image: node:22-alpine
+    command: sh -lc "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/workspace
+    working_dir: /workspace
+
+volumes:
+  bundle-data:
+  postgres-data:
+  redis-data:
