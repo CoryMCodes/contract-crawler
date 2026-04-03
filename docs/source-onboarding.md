@@ -50,3 +50,4 @@ Then register it in [`lib/crawlers/registry.rb`](/Users/corymusick/code/contract
 - Always produce a fingerprint per payload.
 - Capture enough raw content to support parser replays.
 - Avoid source-specific behavior leaking into the API layer.
+- Keep API keys and secrets in environment variables or a secret manager, not in `source.settings` seeds or committed config files.

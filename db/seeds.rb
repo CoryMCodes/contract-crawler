@@ -5,6 +5,9 @@ sam_source = Source.find_or_create_by!(slug: "sam-gov") do |source|
   source.kind = "sam_gov"
   source.base_url = "https://sam.gov"
   source.active = true
+  source.settings = {
+    posted_days_back: 30
+  }
 end
 
 usaspending_source = Source.find_or_create_by!(slug: "usaspending") do |source|
