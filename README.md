@@ -40,6 +40,28 @@ That starts:
 - Sidekiq worker in a separate container
 - React frontend on `http://localhost:5173`
 
+### Add Your SAM.gov API Key
+
+Create a local env file from the committed template:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and set:
+
+```bash
+SAM_GOV_API_KEY=your_real_sam_gov_public_api_key
+```
+
+After updating the key, restart the Rails containers so the new env var is loaded:
+
+```bash
+docker compose up -d --build api worker
+```
+
+The key stays out of git because `.env` is ignored, while [`.env.example`](/Users/corymusick/code/contract-crawler/.env.example) documents the expected variables.
+
 ### Run Tests
 
 ```bash
@@ -50,6 +72,20 @@ docker compose run --rm api bash -lc "bundle install && RAILS_ENV=test bin/rails
 
 ```bash
 docker compose run --rm api bash -lc "bundle install && bin/rails db:seed"
+```
+
+### Run A SAM.gov Sync
+
+Once your key is in `.env`, trigger the seeded SAM.gov source:
+
+```bash
+curl -X POST http://localhost:3000/sources/1/sync
+```
+
+Then check the imported opportunities:
+
+```bash
+curl http://localhost:3000/opportunities
 ```
 
 ## API Endpoints

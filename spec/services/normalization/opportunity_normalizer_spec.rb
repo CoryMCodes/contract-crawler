@@ -43,5 +43,22 @@ RSpec.describe Normalization::OpportunityNormalizer do
       expect(normalized[:estimated_value_low]).to eq(125_000)
       expect(normalized[:estimated_value_high]).to eq(275_000)
     end
+
+    it "maps active yes/no statuses from SAM.gov into open and closed" do
+      source = create(:source, name: "SAM.gov", slug: "sam-gov", kind: "sam_gov")
+
+      active_notice = described_class.new(
+        source:,
+        attributes: { external_id: "A", title: "Active notice", status: "Yes" }
+      ).call
+
+      archived_notice = described_class.new(
+        source:,
+        attributes: { external_id: "B", title: "Archived notice", status: "No" }
+      ).call
+
+      expect(active_notice[:status]).to eq("open")
+      expect(archived_notice[:status]).to eq("closed")
+    end
   end
 end

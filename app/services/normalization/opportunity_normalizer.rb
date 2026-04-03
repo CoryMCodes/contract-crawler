@@ -11,7 +11,9 @@ module Normalization
       "published" => "open",
       "open" => "open",
       "active" => "open",
+      "yes" => "open",
       "closed" => "closed",
+      "no" => "closed",
       "cancelled" => "cancelled",
       "canceled" => "cancelled",
       "archived" => "closed"
@@ -43,7 +45,9 @@ module Normalization
         naics_codes: Array(attributes[:naics_codes]).compact_blank,
         status: normalize_status(attributes[:status]),
         raw_text: attributes[:raw_text].presence || [attributes[:title], attributes[:description]].compact.join(" "),
-        summary_ai: attributes[:summary_ai]
+        summary_ai: attributes[:summary_ai],
+        attachments: Array(attributes[:attachments]),
+        award: attributes[:award]
       }
     end
 

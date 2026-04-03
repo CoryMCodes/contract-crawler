@@ -24,7 +24,22 @@ RSpec.describe SourceIngestion::SyncSource do
         estimated_value_high: 275_000,
         naics_codes: ["237310"],
         status: "Published",
-        raw_text: "Bridge Repair Services Repair and resurface bridge decks."
+        raw_text: "Bridge Repair Services Repair and resurface bridge decks.",
+        attachments: [
+          {
+            title: "Attachment 1",
+            file_url: "https://sam.gov/attachments/bridge-repair.pdf",
+            content_type: "application/pdf",
+            metadata: { source: "sam_gov" }
+          }
+        ],
+        award: {
+          vendor_name: "Acme Infrastructure",
+          amount: 275_000,
+          awarded_at: Date.new(2026, 4, 15),
+          award_number: "AWD-001",
+          source_url: "https://sam.gov/awards/AWD-001"
+        }
       }
 
       allow(Crawlers::Registry).to receive(:build).with(source).and_return(crawler)
@@ -44,9 +59,15 @@ RSpec.describe SourceIngestion::SyncSource do
       expect(source_record.status).to eq("normalized")
       expect(opportunity.source_record).to eq(source_record)
       expect(opportunity.external_id).to eq("SAM-001")
+      expect(opportunity.attachments.count).to eq(1)
+      expect(opportunity.attachments.first.file_url).to eq("https://sam.gov/attachments/bridge-repair.pdf")
+      expect(opportunity.awards.count).to eq(1)
+      expect(opportunity.awards.first.vendor_name).to eq("Acme Infrastructure")
 
       expect { service.call }.not_to change(SourceRecord, :count)
       expect(Opportunity.count).to eq(1)
+      expect(Attachment.count).to eq(1)
+      expect(Award.count).to eq(1)
     end
   end
 end

@@ -63,12 +63,39 @@ module SourceIngestion
         source:,
         external_id: normalized_attributes.fetch(:external_id)
       )
-      opportunity.assign_attributes(normalized_attributes.except(:external_id))
+      opportunity.assign_attributes(normalized_attributes.except(:external_id, :attachments, :award))
       opportunity.source_record = source_record
       opportunity.buyer = buyer
       opportunity.source = source
       opportunity.save!
+      sync_attachments(opportunity:, attachments: normalized_attributes[:attachments])
+      sync_award(opportunity:, award_attributes: normalized_attributes[:award])
       opportunity
+    end
+
+    def sync_attachments(opportunity:, attachments:)
+      return if attachments.blank?
+
+      existing_file_urls = attachments.map { |attachment| attachment.fetch(:file_url) }
+      opportunity.attachments.where.not(file_url: existing_file_urls).delete_all
+
+      attachments.each do |attachment_attributes|
+        attachment = opportunity.attachments.find_or_initialize_by(
+          file_url: attachment_attributes.fetch(:file_url)
+        )
+        attachment.assign_attributes(attachment_attributes)
+        attachment.save!
+      end
+    end
+
+    def sync_award(opportunity:, award_attributes:)
+      return if award_attributes.blank?
+
+      award = opportunity.awards.find_or_initialize_by(
+        award_number: award_attributes[:award_number].presence || "source-award"
+      )
+      award.assign_attributes(award_attributes)
+      award.save!
     end
   end
 end

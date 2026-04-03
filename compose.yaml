@@ -31,6 +31,8 @@ services:
       FRONTEND_ORIGIN: http://localhost:5173
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      SAM_GOV_API_BASE_URL: ${SAM_GOV_API_BASE_URL:-https://api.sam.gov}
+      SAM_GOV_API_KEY: ${SAM_GOV_API_KEY:-}
     ports:
       - "3000:3000"
     volumes:
@@ -50,6 +52,8 @@ services:
       DATABASE_URL_TEST: postgres://postgres:postgres@db:5432/contract_crawler_test
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      SAM_GOV_API_BASE_URL: ${SAM_GOV_API_BASE_URL:-https://api.sam.gov}
+      SAM_GOV_API_KEY: ${SAM_GOV_API_KEY:-}
     volumes:
       - .:/rails
       - bundle-data:/bundle
