@@ -1,32 +1,84 @@
-# Gov Contract Crawler
+# ContractCrawler
 
-Government contract opportunity intelligence platform built with Rails 8, Postgres, Redis, Sidekiq, and a React + TypeScript frontend.
+ContractCrawler is a full-stack application for ingesting, normalizing, and searching government contract opportunities.
 
-## What It Does
+It is designed to transform fragmented public procurement data into a structured, searchable dataset that supports exploration, filtering, and workflow-driven analysis.
 
-- Crawls public procurement and award sources.
-- Persists raw payload snapshots before any normalization.
-- Normalizes source-specific records into a shared opportunity schema.
-- Exposes a Rails JSON API for search, filters, and detail views.
-- Adds a visible AI layer for contract summaries and structured extraction hooks. (Coming Soon)
+## Problem
+Government contract data is:
 
-## Current MVP Slice
+- Distributed across multiple sources (SAM.gov, USAspending, etc.)
+- Inconsistent in structure and quality
+- Difficult to search and aggregate effectively
 
-- Rails 8 API with Postgres-ready models and request endpoints.
-- Sidekiq job entrypoints for source sync and enrichment.
-- Source ingestion service with crawler registry and idempotent raw snapshot storage.
-- Search API for keyword, source, state, status, and due date filters.
-- React frontend scaffold for search, detail, saved searches, and watchlist UX.
-- Source adapters implemented for `SAM.gov`.
+This project focuses on building a pipeline that:
 
+- Ingests raw source data
+- Normalizes it into a consistent schema
+- Exposes it through a clean API and UI
+  
+## Architecture Overview
+- Backend: Rails 8 API
+- Database: PostgreSQL
+- Background Processing: Sidekiq + Redis
+- Frontend: React + TypeScript
+- Infrastructure: Docker / Docker Compose
+
+## Core Concepts
+# Raw Data Preservation
+
+All source payloads are stored before normalization.
+
+This allows:
+
+- Reprocessing as normalization logic evolves
+- Debugging inconsistencies across sources
+
+# Normalization Layer
+
+Each source is mapped into a shared Opportunity schema.
+
+This enables:
+
+- Consistent querying across sources
+- Unified filtering and search
+
+# Idempotent Ingestion
+
+Records are fingerprinted per source to prevent duplication and support safe reprocessing.
+
+# Search API
+
+Supports filtering by:
+
+- keyword
+- source
+- state
+- status
+- due date
+- 
+## Current Status (MVP)
+
+The current implementation includes:
+
+- Rails API with core models and endpoints
+- Background job entry points for ingestion workflows
+- Source ingestion service with pluggable adapters
+- Search API with basic filtering
+- React frontend scaffold for search and detail views
+- 
+# Supported Sources
+- SAM.gov (partial implementation)
+- USAspending (stubbed)
+- 
 ## Quick Start
 
-### Prerequisites
+# Prerequisites
 
 - Docker Desktop
 - Docker Compose
 
-### Boot The Stack
+# Boot The Stack
 
 ```bash
 docker compose up --build
@@ -60,7 +112,7 @@ After updating the key, restart the Rails containers so the new env var is loade
 docker compose up -d --build api worker
 ```
 
-The key stays out of git because `.env` is ignored, while [`.env.example`](/Users/corymusick/code/contract-crawler/.env.example) documents the expected variables.
+The key stays out of git because `.env` is ignored, while [`.env.example`](/.env.example) documents the expected variables.
 
 ### Run Tests
 
@@ -105,7 +157,7 @@ curl http://localhost:3000/opportunities
 
 ## Frontend
 
-The React app lives in [`frontend/`](/Users/corymusick/code/contract-crawler/frontend) and is scaffolded to consume the Rails API contract. The initial watchlist and saved-search UX is local-storage backed while the backend persistence layer is still being expanded.
+The React app lives in [`frontend/`](frontend/) and is scaffolded to consume the Rails API contract. The initial watchlist and saved-search UX is local-storage backed while the backend persistence layer is still being expanded.
 
 ## Project Structure
 
@@ -121,11 +173,23 @@ The React app lives in [`frontend/`](/Users/corymusick/code/contract-crawler/fro
 └── spec/
 ```
 
+## Design Goals
+- Structured data over raw ingestion
+- Clear separation between ingestion and normalization
+- Idempotent, repeatable processing workflows
+- Simple API surface for querying opportunities
+
+## Future Work
+- Expand source adapters and ingestion coverage
+- Improve search with ranking and indexing strategies
+- Add persistence for user workflows (saved searches, watchlists)
+- Introduce AI-assisted summarization and extraction
+
 ## Docs
 
-- [Architecture](/Users/corymusick/code/contract-crawler/docs/architecture.md)
-- [Data Model](/Users/corymusick/code/contract-crawler/docs/data-model.md)
-- [Source Onboarding](/Users/corymusick/code/contract-crawler/docs/source-onboarding.md)
+- [Architecture](/docs/architecture.md)
+- [Data Model](/docs/data-model.md)
+- [Source Onboarding](/docs/source-onboarding.md)
 
 ## Notes
 
