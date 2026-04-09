@@ -8,7 +8,7 @@ Government contract opportunity intelligence platform built with Rails 8, Postgr
 - Persists raw payload snapshots before any normalization.
 - Normalizes source-specific records into a shared opportunity schema.
 - Exposes a Rails JSON API for search, filters, and detail views.
-- Adds a visible AI layer for contract summaries and structured extraction hooks.
+- Adds a visible AI layer for contract summaries and structured extraction hooks. (Coming Soon)
 
 ## Current MVP Slice
 
@@ -17,7 +17,7 @@ Government contract opportunity intelligence platform built with Rails 8, Postgr
 - Source ingestion service with crawler registry and idempotent raw snapshot storage.
 - Search API for keyword, source, state, status, and due date filters.
 - React frontend scaffold for search, detail, saved searches, and watchlist UX.
-- Source adapters stubbed for `SAM.gov` and `USAspending`.
+- Source adapters implemented for `SAM.gov`.
 
 ## Quick Start
 
